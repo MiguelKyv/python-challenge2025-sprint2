@@ -28,34 +28,49 @@ def ServicoCadastrarPessoa():
             ServicoCadastrarPessoa()
         case 2:
             print(f"\nVoltando ao menu de opções...\n")
-            InteracaoMenu()
 
 def ServicoListarPessoas():
     print("\n---- LISTA DE PESSOAS CADASTRADAS ----\n")
     ListarPessoas()
-    print(f"\nVoltando ao menu de opções...\n")
+    input("\nPressione ENTER para voltar ao menu...")
 
 def ServicoEditarPessoa():
     print("\n---------- EDITANDO PESSOA ----------\n")
+    if not lista_pessoas:
+        print("Não há pessoas cadastradas.")
+        input("\nPressione ENTER para voltar ao menu...")
+        return
+
     print("Lista de pessoas cadastradas: \n")
     ListarPessoas()
     id_selecionado = int(input("Digite o ID da pessoa a ser editada: "))
     valor_atual = ExibirPessoa(id_selecionado)
 
     novo_nome = str(input("Digite o novo nome: "))
-    novo_idade = str(input("Digite a nova idade: "))
+    nova_idade = int(input("Digite a nova idade: "))
     novo_cpf = str(input("Digite o novo CPF: "))
     novo_telefone = str(input("Digite o novo telefone: "))
-    pessoa_editada = EditarPessoa(id_selecionado, novo_nome, novo_idade, novo_cpf, novo_telefone)
 
-    print("ANTES\n")
-    print(f"ID: {valor_atual[0]}, Nome: {valor_atual[1]}, Idade: {valor_atual[2]}, CPF: {valor_atual[3]}, Telefone: {valor_atual[4]}\n")
+    if not ValidarCPF(novo_cpf):
+        print("CPF inválido. Edição cancelada.")
+        input("\nPressione ENTER para voltar ao menu...")
+        return
+    
+    if not ValidarTelefone(novo_telefone):
+        print("Telefone inválido. Edição cancelada.")
+        input("\nPressione ENTER para voltar ao menu...")
+        return
 
-    print("DEPOIS\n")
+    pessoa_editada = EditarPessoa(id_selecionado, novo_nome, nova_idade, novo_cpf, novo_telefone)
+
+    print("\nANTES\n")
+    print(f"ID: {valor_atual[0]}, Nome: {valor_atual[1]}, Idade: {valor_atual[2]}, CPF: {valor_atual[3]}, Telefone: {valor_atual[4]}")
+
+    print("\nDEPOIS\n")
     print(f"ID: {pessoa_editada[0]}, Nome: {pessoa_editada[1]}, Idade: {pessoa_editada[2]}, CPF: {pessoa_editada[3]}, Telefone: {pessoa_editada[4]}")
 
-    print(f"\Edição realizada com sucesso! Retornando ao menu de opções...\n")
-    InteracaoMenu()
+    print(f"\nEdição realizada com sucesso! Retornando ao menu de opções...\n")
+    input("Pressione ENTER para continuar...")
 
 def CadastrarPessoas(nome_pessoa: str, idade_pessoa: int, cpf_pessoa: str, telefone_pessoa: str):
     id_pessoa = len(lista_pessoas) + 1
@@ -70,9 +85,11 @@ def ListarPessoas():
         print("Não há pessoas cadastradas.")
 
 def ValidarCPF(cpf: str) -> bool:
+    """Valida se o CPF contém 11 dígitos numéricos."""
     return bool(re.fullmatch(r"\d{11}", cpf))
 
 def ValidarTelefone(telefone: str) -> bool:
+    """Valida se o telefone contém 10 ou 11 dígitos numéricos."""
     return bool(re.fullmatch(r"\d{10,11}", telefone))
 
 def ExibirPessoa(id_pessoa):
@@ -93,14 +110,14 @@ def EditarPessoa(id_pessoa: int, nome: str, idade: int, cpf: str, telefone: str)
 def InteracaoMenu():
     print("\n---------- MENU DE OPÇÕES ----------\n")
     print("1 - Cadastrar pessoa")
-    print("2 - Listas pessoas cadastradas")
+    print("2 - Listar pessoas cadastradas")
     print("3 - Editar pessoa")
-    print(f"0 - Sair do sistema\n")
+    print("0 - Sair do sistema\n")
     opcao_selecionada = int(input("Digite uma opção do menu: "))
     return opcao_selecionada
 
 def ValidaOpcaoSelecionadoMenu(menu: int, lista_menu: list, opcao_selecionada: int):
-    while not opcao_selecionada in lista_menu:
+    while opcao_selecionada not in lista_menu:
         print("\nOpção inválida. Digite um número entre as opções disponíveis.\n")
         MostrarOpcoesDeVoltarAoMenu(menu)
         opcao_selecionada = int(input("Selecione o número da opção: "))
@@ -116,8 +133,7 @@ def MostrarOpcoesDeVoltarAoMenu(menu: int):
             return lista_opcoes
 
 def IniciarSistema():
-    opcao_menu = 1
-    while opcao_menu != 0:
+    while True:
         opcao_menu = InteracaoMenu()
         match opcao_menu:
             case 0:
@@ -130,8 +146,7 @@ def IniciarSistema():
             case 3:
                 ServicoEditarPessoa()
             case _:
-                print("Opção inválida. Tente novamente")
+                print("Opção inválida. Tente novamente.")
 
 IniciarSistema()
-
 print("Sistema encerrado")
